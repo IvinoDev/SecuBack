@@ -76,6 +76,7 @@ public class CustomAuthentificationFilter extends UsernamePasswordAuthentication
         tokens.put("refresh_token", refresh_token);
         response.setContentType(APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+        log.info("the current content: {}", response.getOutputStream());
         }
     }
 
