@@ -12,6 +12,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -27,6 +28,8 @@ public class ProfilServImpl implements ProfilService, UserDetailsService {
 
    private final ProfilRepository profilRepository;
    private final RoleRepository roleRepository;
+   private final PasswordEncoder passwordEncoder;
+
 
 
     @Override
@@ -43,13 +46,14 @@ public class ProfilServImpl implements ProfilService, UserDetailsService {
             authorities.add(new SimpleGrantedAuthority(role.getName()));
         });
 
-        return new org.springframework.security.core.userdetails.User(profil.getFname(), profil.getLname(), profil.getUsername(),
-                profil.getPassword(), profil.getEmail(), profil.getType(), authorities);
+        return new org.springframework.security.core.userdetails.User(profil.getUsername(),
+                profil.getPassword(), authorities);
     }
 
     @Override
     public Profil saveProfil(Profil profil) {
         log.info("saving {} as a new collaborator with success.", profil.getUsername());
+        profil.setPassword(passwordEncoder.encode(profil.getPassword()));
         return profilRepository.save(profil);
     }
 

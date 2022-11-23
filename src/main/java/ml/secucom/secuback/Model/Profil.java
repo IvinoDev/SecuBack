@@ -17,15 +17,15 @@ public class Profil {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, length = 40)
+    @Column(nullable = false)
     private String fname;
-    @Column(nullable = false, length = 40)
+    @Column(nullable = false)
     private String lname;
-    @Column(nullable = false, length = 50, unique = true)
+    @Column(nullable = false, unique = true)
     private String username;
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false)
     private String password;
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false)
     private String email;
     @Enumerated(EnumType.STRING)
     private Type type;
