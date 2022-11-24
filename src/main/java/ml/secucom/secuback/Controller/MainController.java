@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import ml.secucom.secuback.Configuration.ResponseHandler;
 import ml.secucom.secuback.Model.Profil;
 import ml.secucom.secuback.Model.Role;
+import ml.secucom.secuback.Model.Type;
 import ml.secucom.secuback.Repository.ProfilRepository;
 import ml.secucom.secuback.Repository.RoleRepository;
 import ml.secucom.secuback.Service.ProfilService;
@@ -46,6 +47,16 @@ public class MainController {
         return ResponseEntity.ok().body(profilService.getProfils());
     }
 
+    @GetMapping("/greetings")
+    public String greetUser (@RequestBody RoleToCollabForm form){
+        Profil profil = profilRepository.findByUsername(form.getUsername());
+        if(profil.getType() == Type.ADMIN) {
+            return "Bienvenue cher Admin !";
+        } else {
+            return "Bienvenue cher User";
+        }
+    }
+
     @PostMapping("/collaborator/add")
     public ResponseEntity<Profil> saveNewProfil(Profil profil) {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/secuback/collaborators/add").toUriString());
@@ -59,9 +70,9 @@ public class MainController {
 
 
     @PostMapping("/role/addToCollaborator")
-    public ResponseEntity<?> addRoleToCollaborator(RoleToCollabForm form) {
-        profilService.addRoleToProfil(form.getUsername(), form.getRoleName());
-        return ResponseEntity.ok().build();
+    public Profil addRoleToCollaborator(@RequestBody RoleToCollabForm form) {
+        return profilService.addRoleToProfil(form.getUsername(), form.getRoleName());
+
     }
 
     @GetMapping("/token/refresh")
@@ -77,7 +88,7 @@ public class MainController {
                 Profil profil = profilService.getProfil(username);
                 String access_token = JWT.create()
                         .withSubject(profil.getUsername())
-                        .withExpiresAt(new Date(System.currentTimeMillis() + 36000))
+                        .withExpiresAt(new Date(System.currentTimeMillis() + 3600000))
                         //Pour ajouter le nom de l'api contenu dans l'url en tant que signateur du JWT
                         .withIssuer(request.getRequestURL().toString())
                         .withClaim("roles",
@@ -151,5 +162,6 @@ public class MainController {
 class RoleToCollabForm {
     private String username;
     private String roleName;
+
 
 }

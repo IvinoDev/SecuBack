@@ -57,7 +57,7 @@ public class CustomAuthentificationFilter extends UsernamePasswordAuthentication
 
         String access_token = JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 36000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 3600000))
                 //Pour ajouter le nom de l'api contenu dans l'url en tant que signateur du JWT
                 .withIssuer(request.getRequestURL().toString())
                 .withClaim("roles",
@@ -66,7 +66,7 @@ public class CustomAuthentificationFilter extends UsernamePasswordAuthentication
 
         String refresh_token = JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 36000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 3600000))
                 //Pour ajouter le nom de l'api contenu dans l'url en tant que signateur du JWT
                 .withIssuer(request.getRequestURL().toString())
                 .sign(algorithm);
@@ -78,12 +78,15 @@ public class CustomAuthentificationFilter extends UsernamePasswordAuthentication
         response.setHeader("access_token", access_token);
         response.setHeader("refresh_token", refresh_token);
         response.setHeader("user", user.getUsername());
+        //Profil profil = profilRepository.findByUsername(user.getUsername());
+
 
         //pour retourner les infos des deux tokens dans le body
         Map<String, String> tokens = new HashMap<>();
         tokens.put("access_token", access_token);
         tokens.put("refresh_token", refresh_token);
         tokens.put("user", user.getUsername());
+        //tokens.put("usertwo", profil.getLname());
         response.setContentType(APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(), tokens);
         log.info("the current content: {}", response.getOutputStream());

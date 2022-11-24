@@ -86,12 +86,15 @@ public class ProfilServImpl implements ProfilService, UserDetailsService {
     }
 
     @Override
-    public void addRoleToProfil(String username, String roleName) {
+    public Profil addRoleToProfil(String username, String roleName) {
         log.info("adding {} as a role to {} with success.", roleName, username);
         Profil profil = profilRepository.findByUsername(username);
         Role role = roleRepository.findByName(roleName);
+        System.out.println(role);
         profil.getRoles().add(role);
-        profilRepository.save(profil);
+        System.out.println(profil.getRoles());
+        return profilRepository.save(profil);
+
         //l'annotation transactionnal va s'occuper de la sauvegarde dans la base de donnees
     }
 

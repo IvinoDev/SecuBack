@@ -38,11 +38,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         customAuthentificationFilter.setFilterProcessesUrl("/secuback/login");
         //Pour desactiver la session generee par defaut de Spring Security
         http.csrf().disable();
+        http.cors().disable();
         http.sessionManagement().sessionCreationPolicy(STATELESS);
         //Droit les pages accessible a tous
+        http.formLogin();
         http.authorizeRequests().antMatchers("/secuback/login/**" , "/secuback/token/refresh/**").permitAll();
         //Gestion des droits d'acces aux differents endpoints en fonction des roles
-        http.authorizeRequests().antMatchers(GET, "/secuback/collaborator/all")
+        http.authorizeRequests().antMatchers(GET, "/secuback/collaborator/all", "/secuback/greetings")
                 .hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
         http.authorizeRequests().antMatchers(POST, "/secuback/collaborator/add/**")
                 .hasAnyAuthority("ROLE_ADMIN");
