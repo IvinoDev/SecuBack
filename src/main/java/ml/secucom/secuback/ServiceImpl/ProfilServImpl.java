@@ -64,6 +64,27 @@ public class ProfilServImpl implements ProfilService, UserDetailsService {
     }
 
     @Override
+    public Profil editProfil(Profil profil, Long id) {
+        Profil currentprofil = profilRepository.findById(id).orElse(null);
+        if (currentprofil != null) {
+            return profilRepository.save(profil);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Profil deleteProfil(Long id) {
+        Profil currentprofil = profilRepository.findById(id).orElse(null);
+        if (currentprofil != null) {
+            profilRepository.deleteById(id);
+            return currentprofil;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
     public void addRoleToProfil(String username, String roleName) {
         log.info("adding {} as a role to {} with success.", roleName, username);
         Profil profil = profilRepository.findByUsername(username);

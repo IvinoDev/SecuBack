@@ -5,6 +5,9 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import ml.secucom.secuback.Model.Profil;
+import ml.secucom.secuback.Model.Type;
+import ml.secucom.secuback.Repository.ProfilRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -29,6 +32,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class CustomAuthentificationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
+    @Autowired
+    private ProfilRepository profilRepository;
     public CustomAuthentificationFilter (AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
     }
@@ -52,7 +57,7 @@ public class CustomAuthentificationFilter extends UsernamePasswordAuthentication
 
         String access_token = JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 5000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 36000))
                 //Pour ajouter le nom de l'api contenu dans l'url en tant que signateur du JWT
                 .withIssuer(request.getRequestURL().toString())
                 .withClaim("roles",
@@ -61,23 +66,29 @@ public class CustomAuthentificationFilter extends UsernamePasswordAuthentication
 
         String refresh_token = JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 5000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 36000))
                 //Pour ajouter le nom de l'api contenu dans l'url en tant que signateur du JWT
                 .withIssuer(request.getRequestURL().toString())
                 .sign(algorithm);
 
+        //Pour verifier du profil de l'user
+
+
         //Pour retourner les infos des deux tokens dans les headers
         response.setHeader("access_token", access_token);
         response.setHeader("refresh_token", refresh_token);
+        response.setHeader("user", user.getUsername());
 
         //pour retourner les infos des deux tokens dans le body
         Map<String, String> tokens = new HashMap<>();
         tokens.put("access_token", access_token);
         tokens.put("refresh_token", refresh_token);
+        tokens.put("user", user.getUsername());
         response.setContentType(APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(), tokens);
         log.info("the current content: {}", response.getOutputStream());
         }
+
     }
 
 

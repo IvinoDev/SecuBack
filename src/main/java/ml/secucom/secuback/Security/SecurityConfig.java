@@ -15,8 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.*;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
@@ -40,17 +39,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         //Pour desactiver la session generee par defaut de Spring Security
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(STATELESS);
-        //Droit pour une page accessible a tous
-        http.authorizeRequests().antMatchers("/secuback/login/**").permitAll();
+        //Droit les pages accessible a tous
+        http.authorizeRequests().antMatchers("/secuback/login/**" , "/secuback/token/refresh/**").permitAll();
         //Gestion des droits d'acces aux differents endpoints en fonction des roles
         http.authorizeRequests().antMatchers(GET, "/secuback/collaborator/all")
-                .hasAnyAuthority("ROLE_USER", "ROLE_ADMIN", "ROLE_SUPERADMIN");
+                .hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
         http.authorizeRequests().antMatchers(POST, "/secuback/collaborator/add/**")
-                .hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPERADMIN");
+                .hasAnyAuthority("ROLE_ADMIN");
         http.authorizeRequests().antMatchers(POST, "/secuback/role/add")
-                .hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPERADMIN");
+                .hasAnyAuthority("ROLE_ADMIN");
         http.authorizeRequests().antMatchers(POST, "/secuback/role/addToCollaborator")
-                .hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPERADMIN");
+                .hasAnyAuthority("ROLE_ADMIN");
+        http.authorizeRequests().antMatchers(PUT, "/secuback/collaborator/edit/**")
+                .hasAnyAuthority("ROLE_ADMIN");
+        http.authorizeRequests().antMatchers(DELETE, "/secuback/collaborator/delete/**")
+                .hasAnyAuthority("ROLE_ADMIN");
         //Devoir etre connecter pour effectuer les choses declarees plus haut
         http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(customAuthentificationFilter);

@@ -31,7 +31,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         //Verification pour ne pas restreindre l'acces a la page de connexion
-        if(request.getServletPath().equals("/secuback/login")) {
+        if(request.getServletPath().equals("/secuback/login") || request.getServletPath().equals("/secuback/token/refresh")) {
             filterChain.doFilter(request, response);
         } else { //Si cela ne concerne pas la page connexion
             String authorizationHeader = request.getHeader(AUTHORIZATION);

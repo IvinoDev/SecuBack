@@ -8,27 +8,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ml.secucom.secuback.Configuration.ResponseHandler;
 import ml.secucom.secuback.Model.Profil;
 import ml.secucom.secuback.Model.Role;
 import ml.secucom.secuback.Repository.ProfilRepository;
 import ml.secucom.secuback.Repository.RoleRepository;
 import ml.secucom.secuback.Service.ProfilService;
 import ml.secucom.secuback.Service.RoleService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.Arrays.stream;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -67,7 +65,7 @@ public class MainController {
     }
 
     @GetMapping("/token/refresh")
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String authorizationHeader = request.getHeader(AUTHORIZATION);
         if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             try {
@@ -79,7 +77,7 @@ public class MainController {
                 Profil profil = profilService.getProfil(username);
                 String access_token = JWT.create()
                         .withSubject(profil.getUsername())
-                        .withExpiresAt(new Date(System.currentTimeMillis() + 5000))
+                        .withExpiresAt(new Date(System.currentTimeMillis() + 36000))
                         //Pour ajouter le nom de l'api contenu dans l'url en tant que signateur du JWT
                         .withIssuer(request.getRequestURL().toString())
                         .withClaim("roles",
@@ -96,8 +94,6 @@ public class MainController {
                 tokens.put("refresh_token", refresh_token);
                 response.setContentType(APPLICATION_JSON_VALUE);
                 new ObjectMapper().writeValue(response.getOutputStream(), tokens);
-                log.info("the current content: {}", response.getOutputStream());
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             } catch (Exception exception) {
                 log.error("error logging in: {}", exception.getMessage());
                 response.setHeader("error", exception.getMessage());
@@ -110,6 +106,43 @@ public class MainController {
             }
         } else {
             throw new RuntimeException("refresh token is missing");
+        }
+    }
+
+
+
+
+    @PutMapping("/collaborator/edit/{id}")
+    ResponseEntity<Object> editCollab(@RequestBody Profil profil,@PathVariable long id) {
+        if (profilService.editProfil(profil,id) != null) {
+            return ResponseHandler.generateResponse(
+                    "Collaborator modified with succes",
+                    HttpStatus.OK,
+                    profilService.editProfil(profil, id)
+            );
+        } else {
+            return ResponseHandler.generateResponse(
+                    "Sorry, this profil doesn't exist",
+                    HttpStatus.BAD_REQUEST,
+                    profilService.editProfil(profil, id)
+            );
+        }
+
+    }
+    @DeleteMapping("/collaborator/delete/{id}")
+    ResponseEntity<Object> deleteCollab(@PathVariable long id) {
+        if (profilService.deleteProfil(id) != null) {
+            return ResponseHandler.generateResponse(
+                    "Collaborator deleted with succes !",
+                    HttpStatus.OK,
+                    profilService.deleteProfil(id)
+            );
+        } else {
+            return ResponseHandler.generateResponse(
+                    "this collaborator doesn't exist",
+                    HttpStatus.BAD_REQUEST,
+                    profilService.deleteProfil(id)
+            );
         }
     }
 }

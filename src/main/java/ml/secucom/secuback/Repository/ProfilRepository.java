@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface ProfilRepository extends JpaRepository<Profil, Long> {
     Profil findByUsername(String username);
 
+    Profil findByUsernameAndPassword(String username, String password);
+
 }
