@@ -47,20 +47,20 @@ public class MainController {
     }
 
     @PostMapping("/collaborator/add")
-    public ResponseEntity<Profil> saveProfils(Profil profil) {
+    public ResponseEntity<Profil> saveNewProfil(Profil profil) {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/secuback/collaborators/add").toUriString());
         return ResponseEntity.created(uri).body(profilService.saveProfil(profil));
     }
 
     @PostMapping("/role/add")
-    public ResponseEntity<Role> saveProfils(Role role) {
+    public ResponseEntity<Role> saveNewRole(Role role) {
         return ResponseEntity.ok().body(profilService.saveRole(role));
     }
 
 
     @PostMapping("/role/addToCollaborator")
-    public ResponseEntity<?> addRoleToCollaborator(@RequestBody RoleToCollabForm form) {
-        profilService.addRoleToProfil(form.getUsername(), form.getPassword());
+    public ResponseEntity<?> addRoleToCollaborator(RoleToCollabForm form) {
+        profilService.addRoleToProfil(form.getUsername(), form.getRoleName());
         return ResponseEntity.ok().build();
     }
 
@@ -111,12 +111,12 @@ public class MainController {
 
 
 
-
+    //uniquement en JSON dans Postman
     @PutMapping("/collaborator/edit/{id}")
-    ResponseEntity<Object> editCollab(@RequestBody Profil profil,@PathVariable long id) {
+    ResponseEntity<Object> editCollab(Profil profil,@PathVariable long id) {
         if (profilService.editProfil(profil,id) != null) {
             return ResponseHandler.generateResponse(
-                    "Collaborator modified with succes",
+                    "Collaborator modified with success",
                     HttpStatus.OK,
                     profilService.editProfil(profil, id)
             );
@@ -133,7 +133,7 @@ public class MainController {
     ResponseEntity<Object> deleteCollab(@PathVariable long id) {
         if (profilService.deleteProfil(id) != null) {
             return ResponseHandler.generateResponse(
-                    "Collaborator deleted with succes !",
+                    "Collaborator deleted with success",
                     HttpStatus.OK,
                     profilService.deleteProfil(id)
             );
@@ -150,6 +150,6 @@ public class MainController {
 @Data
 class RoleToCollabForm {
     private String username;
-    private String password;
+    private String roleName;
 
 }

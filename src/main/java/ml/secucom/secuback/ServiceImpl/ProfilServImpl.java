@@ -67,6 +67,7 @@ public class ProfilServImpl implements ProfilService, UserDetailsService {
     public Profil editProfil(Profil profil, Long id) {
         Profil currentprofil = profilRepository.findById(id).orElse(null);
         if (currentprofil != null) {
+            profil.setPassword(passwordEncoder.encode(profil.getPassword()));
             return profilRepository.save(profil);
         } else {
             return null;
@@ -74,14 +75,14 @@ public class ProfilServImpl implements ProfilService, UserDetailsService {
     }
 
     @Override
-    public Profil deleteProfil(Long id) {
+    public Object deleteProfil(Long id) {
         Profil currentprofil = profilRepository.findById(id).orElse(null);
         if (currentprofil != null) {
             profilRepository.deleteById(id);
-            return currentprofil;
         } else {
             return null;
         }
+        return "Sorry you can't do this action";
     }
 
     @Override
@@ -90,6 +91,7 @@ public class ProfilServImpl implements ProfilService, UserDetailsService {
         Profil profil = profilRepository.findByUsername(username);
         Role role = roleRepository.findByName(roleName);
         profil.getRoles().add(role);
+        profilRepository.save(profil);
         //l'annotation transactionnal va s'occuper de la sauvegarde dans la base de donnees
     }
 

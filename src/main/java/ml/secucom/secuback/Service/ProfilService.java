@@ -15,7 +15,7 @@ public interface ProfilService {
     Profil editProfil (Profil profil, Long id);
 
     //fonction qui supprime un profil
-    Profil deleteProfil (Long id);
+    Object deleteProfil (Long id);
 
     //fonction qui se contente d'ajouter un role a un profil, donc elle ne retourne rien
     void addRoleToProfil (String username, String roleName);

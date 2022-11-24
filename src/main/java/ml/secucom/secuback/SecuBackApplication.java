@@ -55,7 +55,7 @@ public class SecuBackApplication {
 
                 profilService.addRoleToProfil("BabaBallo", "ROLE_USER");
             }
-                System.out.println("App launch with our default users is okay");
+                System.out.println("App successfully launched with our default users");
         };
     }
 }
