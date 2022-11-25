@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ml.secucom.secuback.Configuration.ResponseHandler;
+import ml.secucom.secuback.Filter.CustomAuthentificationFilter;
 import ml.secucom.secuback.Model.Profil;
 import ml.secucom.secuback.Model.Role;
 import ml.secucom.secuback.Model.Type;
@@ -54,25 +55,43 @@ public class MainController {
 
     @RequestMapping("/**")
     private StringBuffer getOauth2LoginInfo(Principal profil){
-
         StringBuffer protectedInfo = new StringBuffer();
+        try {
 
-        OAuth2AuthenticationToken authToken = ((OAuth2AuthenticationToken) profil);
-        OAuth2AuthorizedClient authClient =
-                this.authorizedClientService.loadAuthorizedClient(authToken.getAuthorizedClientRegistrationId(), authToken.getName());
-        if(authToken.isAuthenticated()){
 
-            Map<String,Object> userAttributes = ((DefaultOAuth2User) authToken.getPrincipal()).getAttributes();
+            OAuth2AuthenticationToken authToken = ((OAuth2AuthenticationToken) profil);
+            OAuth2AuthorizedClient authClient =
+                    this.authorizedClientService.loadAuthorizedClient(authToken.getAuthorizedClientRegistrationId(), authToken.getName());
+            if(authToken.isAuthenticated()){
 
-            String userToken = authClient.getAccessToken().getTokenValue();
-            protectedInfo.append("Bienvenue, " + userAttributes.get("name")+"<br><br>");
-            protectedInfo.append("e-mail: " + userAttributes.get("email")+"<br><br>");
-            protectedInfo.append("Access Token: " + userToken+"<br><br>");
-        }
-        else{
-            protectedInfo.append("NA");
+                Map<String,Object> userAttributes = ((DefaultOAuth2User) authToken.getPrincipal()).getAttributes();
+
+                String userToken = authClient.getAccessToken().getTokenValue();
+                protectedInfo.append("Bienvenue, " + userAttributes.get("name")+"<br><br>");
+                protectedInfo.append("e-mail: " + userAttributes.get("email")+"<br><br>");
+                protectedInfo.append("Access Token: " + userToken+"<br><br>");
+            }
+            else{
+                protectedInfo.append("NA");
+            }
+        }catch (Exception e){
+
+            Profil user = profilRepository.findByUsername(profil.getName());
+            if(user.getType() == Type.ADMIN) {
+                protectedInfo.append("Bienvenue cher Admin ! <br><br>");
+                protectedInfo.append(profil.getName());
+                //return "Bienvenue cher Admin !";
+            } else {
+                protectedInfo.append("Bienvenue cher User ! <br><br>");
+                protectedInfo.append(profil.getName());
+
+                // return "Bienvenue cher User";
+            }
+
         }
         return protectedInfo;
+
+
     }
 
     @GetMapping("/collaborator/all")
