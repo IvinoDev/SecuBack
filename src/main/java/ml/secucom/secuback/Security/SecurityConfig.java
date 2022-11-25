@@ -39,7 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         //Pour desactiver la session generee par defaut de Spring Security
         http.csrf().disable();
         http.cors().disable();
-        http.sessionManagement().sessionCreationPolicy(STATELESS);
+        //http.sessionManagement().sessionCreationPolicy(STATELESS);
         //Droit les pages accessible a tous
         http.formLogin();
         http.authorizeRequests().antMatchers("/secuback/login/**" , "/secuback/token/refresh/**").permitAll();
@@ -54,8 +54,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .hasAnyAuthority("ROLE_ADMIN");
         http.authorizeRequests().antMatchers(PUT, "/secuback/collaborator/edit/**")
                 .hasAnyAuthority("ROLE_ADMIN");
-        http.authorizeRequests().antMatchers(DELETE, "/secuback/collaborator/delete/**")
-                .hasAnyAuthority("ROLE_ADMIN");
+        http.authorizeRequests().antMatchers(DELETE, "/secuback/login/delete/**")
+                .hasAnyAuthority("ROLE_ADMIN")
+                .and()
+                .oauth2Login();
+        http.authorizeRequests().antMatchers(POST, "/secuback/greetings");
         //Devoir etre connecter pour effectuer les choses declarees plus haut
         http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(customAuthentificationFilter);

@@ -49,7 +49,8 @@ public class CustomAuthentificationFilter extends UsernamePasswordAuthentication
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+                                            Authentication authentication) throws IOException, ServletException {
         //super.successfulAuthentication(request, response, chain, authentication);
         User user = (User)authentication.getPrincipal();
         //Algo utilise pour signer les JWT
