@@ -16,8 +16,13 @@ import ml.secucom.secuback.Repository.ProfilRepository;
 import ml.secucom.secuback.Repository.RoleRepository;
 import ml.secucom.secuback.Service.ProfilService;
 import ml.secucom.secuback.Service.RoleService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -25,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
+import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,13 +40,40 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @Slf4j
-@RequestMapping("/secuback")
+//@RequestMapping("/secuback")
 @RequiredArgsConstructor
 public class MainController {
     private final ProfilRepository profilRepository;
     private final ProfilService profilService;
     private final RoleRepository roleRepository;
     private final RoleService roleService;
+
+
+    private final OAuth2AuthorizedClientService authorizedClientService;
+
+
+    @RequestMapping("/**")
+    private StringBuffer getOauth2LoginInfo(Principal profil){
+
+        StringBuffer protectedInfo = new StringBuffer();
+
+        OAuth2AuthenticationToken authToken = ((OAuth2AuthenticationToken) profil);
+        OAuth2AuthorizedClient authClient =
+                this.authorizedClientService.loadAuthorizedClient(authToken.getAuthorizedClientRegistrationId(), authToken.getName());
+        if(authToken.isAuthenticated()){
+
+            Map<String,Object> userAttributes = ((DefaultOAuth2User) authToken.getPrincipal()).getAttributes();
+
+            String userToken = authClient.getAccessToken().getTokenValue();
+            protectedInfo.append("Bienvenue, " + userAttributes.get("name")+"<br><br>");
+            protectedInfo.append("e-mail: " + userAttributes.get("email")+"<br><br>");
+            protectedInfo.append("Access Token: " + userToken+"<br><br>");
+        }
+        else{
+            protectedInfo.append("NA");
+        }
+        return protectedInfo;
+    }
 
     @GetMapping("/collaborator/all")
     public ResponseEntity<List<Profil>> getAllProfils() {

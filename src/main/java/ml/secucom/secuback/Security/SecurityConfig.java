@@ -42,7 +42,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         //http.sessionManagement().sessionCreationPolicy(STATELESS);
         //Droit les pages accessible a tous
         http.formLogin();
-        http.authorizeRequests().antMatchers("/secuback/login/**" , "/secuback/token/refresh/**").permitAll();
+        http.authorizeRequests().antMatchers( "/**" , "/secuback/login/**" , "/secuback/token/refresh/**").permitAll();
         //Gestion des droits d'acces aux differents endpoints en fonction des roles
         http.authorizeRequests().antMatchers(GET, "/secuback/collaborator/all", "/secuback/greetings")
                 .hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
