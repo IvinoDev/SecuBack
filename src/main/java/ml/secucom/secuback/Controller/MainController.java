@@ -67,9 +67,9 @@ public class MainController {
                 Map<String,Object> userAttributes = ((DefaultOAuth2User) authToken.getPrincipal()).getAttributes();
 
                 String userToken = authClient.getAccessToken().getTokenValue();
-                protectedInfo.append("Bienvenue, " + userAttributes.get("name")+"<br><br>");
-                protectedInfo.append("e-mail: " + userAttributes.get("email")+"<br><br>");
-                protectedInfo.append("Access Token: " + userToken+"<br><br>");
+                protectedInfo.append("Bienvenue, ").append(userAttributes.get("name")).append("<br><br>");
+                protectedInfo.append("e-mail: ").append(userAttributes.get("email")).append("<br><br>");
+                protectedInfo.append("Access Token: ").append(userToken).append("<br><br>");
             }
             else{
                 protectedInfo.append("NA");

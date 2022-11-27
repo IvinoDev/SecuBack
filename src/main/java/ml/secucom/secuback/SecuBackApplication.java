@@ -33,7 +33,7 @@ public class SecuBackApplication {
         return args -> {
             Profil newProfilAdmin = profilRepository.findByUsername("MKDev");
             Profil newProfilUser = profilRepository.findByUsername("BabaBallo");
-            if(newProfilUser == null && newProfilUser == null) {
+            if(newProfilAdmin == null && newProfilUser == null) {
                 profilService.saveRole(new Role(null, "ROLE_USER"));
                 profilService.saveRole(new Role(null, "ROLE_ADMIN"));
                 profilService.saveProfil(new Profil(
