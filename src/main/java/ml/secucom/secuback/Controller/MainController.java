@@ -56,20 +56,19 @@ public class MainController {
     @RequestMapping("/**")
     private StringBuffer getOauth2LoginInfo(Principal profil){
         StringBuffer protectedInfo = new StringBuffer();
+        String nom;
         try {
-
-
             OAuth2AuthenticationToken authToken = ((OAuth2AuthenticationToken) profil);
             OAuth2AuthorizedClient authClient =
                     this.authorizedClientService.loadAuthorizedClient(authToken.getAuthorizedClientRegistrationId(), authToken.getName());
+            Map<String,Object> userAttributes = ((DefaultOAuth2User) authToken.getPrincipal()).getAttributes();
+
             if(authToken.isAuthenticated()){
-
-                Map<String,Object> userAttributes = ((DefaultOAuth2User) authToken.getPrincipal()).getAttributes();
-
+                nom = (String) userAttributes.get("name");
                 String userToken = authClient.getAccessToken().getTokenValue();
-                protectedInfo.append("Bienvenue, ").append(userAttributes.get("name")).append("<br><br>");
-                protectedInfo.append("e-mail: ").append(userAttributes.get("email")).append("<br><br>");
-                protectedInfo.append("Access Token: ").append(userToken).append("<br><br>");
+                protectedInfo.append("Bienvenue, ").append(userAttributes.get("name"));
+                protectedInfo.append("e-mail: ").append(userAttributes.get("email"));
+                protectedInfo.append("Access Token: ").append(userToken);
             }
             else{
                 protectedInfo.append("NA");
@@ -78,11 +77,11 @@ public class MainController {
 
             Profil user = profilRepository.findByUsername(profil.getName());
             if(user.getType() == Type.ADMIN) {
-                protectedInfo.append("Bienvenue cher Admin ! <br><br>");
+                protectedInfo.append("Bienvenue cher Admin ! ");
                 protectedInfo.append(profil.getName());
                 //return "Bienvenue cher Admin !";
             } else {
-                protectedInfo.append("Bienvenue cher User ! <br><br>");
+                protectedInfo.append("Bienvenue cher User ! ");
                 protectedInfo.append(profil.getName());
 
                 // return "Bienvenue cher User";
