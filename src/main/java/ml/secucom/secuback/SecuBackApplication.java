@@ -24,7 +24,7 @@ public class SecuBackApplication {
     }
 
     @Bean
-    PasswordEncoder passwordEncoder () {
+    PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     };
 
